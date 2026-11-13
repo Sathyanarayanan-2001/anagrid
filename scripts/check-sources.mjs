@@ -10,6 +10,15 @@
 import { BODIES, DOCS } from '../src/sources/catalog.js';
 import { withRetry } from '../src/core/util.js';
 
+// Hosts that answer GitHub's servers with 404 or no answer while serving the same pages to an
+// ordinary visitor. Checked by hand on 13/11/2026: every catalogue link on these hosts loaded
+// through a second route. Their failures are reported as "refused" (warning), not "dead", so
+// the monthly run keeps meaning "a link to fix". Remove a host when it starts answering.
+const BLOCKS_DATACENTRES = new Map([
+  ['cea.nic.in', 'answers 404 to GitHub runners; pages load for visitors'],
+  ['egazette.gov.in', 'does not answer GitHub runners; pages load for visitors'],
+]);
+
 const links = new Map(); // url -> what it is for; a map so each URL is requested once
 for (const b of BODIES) links.set(b.url, (links.get(b.url) || []).concat(b.name));
 for (const d of DOCS) links.set(d.url, (links.get(d.url) || []).concat(d.ref));
@@ -30,7 +39,9 @@ for (const [url, what] of links) {
   // A timeout per request plus retries with backoff: one slow site must not stall or fail the run.
   try { status = await withRetry(async () => { const s = await probe(url); if (s >= 500) throw new Error('HTTP ' + s); return s; }, { tries: 3, timeoutMs: 30000, baseDelayMs: 2000 }); }
   catch (e) { status = 0; error = e && e.message ? e.message : String(e); }
-  const state = status >= 200 && status < 400 ? 'ok' : [401, 403, 405, 429].includes(status) ? 'refused' : 'dead';
+  const host = new URL(url).hostname;
+  let state = status >= 200 && status < 400 ? 'ok' : [401, 403, 405, 429].includes(status) ? 'refused' : 'dead';
+  if (state === 'dead' && BLOCKS_DATACENTRES.has(host)) { state = 'refused'; error = (error ? error + '; ' : '') + BLOCKS_DATACENTRES.get(host); }
   rows.push({ state, status, url, what: [...new Set(what)].join(', '), error });
   console.log(state.padEnd(8) + String(status || '-').padEnd(5) + url + '  [' + rows.at(-1).what + ']' + (error ? '  ' + error : ''));
 }
