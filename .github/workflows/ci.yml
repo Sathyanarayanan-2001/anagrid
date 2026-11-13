@@ -1,0 +1,27 @@
+name: CI
+
+# Tests run on every push and every pull request.
+on:
+  push:
+  pull_request:
+
+# Read-only by default; no job here needs to write.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Unit tests
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Browser tests
+        run: npm run test:e2e

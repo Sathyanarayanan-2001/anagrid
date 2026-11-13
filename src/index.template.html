@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta http-equiv="Content-Security-Policy" content="{{CSP}}">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#047857">
+<meta name="description" content="AnaGrid: grid code register, requirement extraction and compliance sheet for wind turbine grid connection. Works offline; data stays on your device.">
+<title>AnaGrid</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>{{STYLE}}</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div id="app" class="app">
+  <header class="top">
+    <a class="brand" href="#home" aria-label="AnaGrid home"><span class="logo" aria-hidden="true"></span><span class="brand-name">AnaGrid</span></a>
+    <label class="country"><span class="sr">Country</span><select id="country" aria-label="Country filter"></select></label>
+    <button type="button" class="pill" id="sync-pill" data-act="go" data-tab="data" title="Sync state"><span class="dot" aria-hidden="true"></span><span id="sync-text">Saved on this device</span></button>
+    <button type="button" class="icon-btn" id="theme-btn" data-act="theme" aria-label="Colour theme"><span id="theme-text">Auto</span></button>
+  </header>
+  <nav class="side" id="side" aria-label="Sections"></nav>
+  <main id="main" tabindex="-1"></main>
+  <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+</div>
+<div id="dialogs"></div>
+<div id="tip" class="tip" role="tooltip" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<noscript><p class="noscript">AnaGrid needs JavaScript. Enable it in your browser settings and reload this page.</p></noscript>
+<script>{{SCRIPT}}</script>
+</body>
+</html>
