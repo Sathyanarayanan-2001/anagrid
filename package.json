@@ -1,0 +1,21 @@
+{
+  "name": "anagrid",
+  "version": "1.0.0",
+  "description": "Grid code document register, requirement extractor and compliance sheet for wind turbine grid connection. Static, offline-first, single-file web app.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "test:e2e": "node scripts/e2e.mjs",
+    "serve": "node scripts/serve.mjs",
+    "check": "npm test && npm run build && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@fontsource/ibm-plex-sans": "5.3.0",
+    "esbuild": "0.25.12",
+    "puppeteer-core": "25.17.0"
+  }
+}

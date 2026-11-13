@@ -1,0 +1,44 @@
+# Dependencies and build output
+node_modules/
+dist/
+.scratch/
+
+# Personal data must never be committed.
+# Save files written by folder sync, backups and exports:
+anagrid-save-*
+anagrid-backup-*
+anagrid-requirements-*
+anagrid-capabilities-*
+*.json.gz
+*.bak
+*.backup
+backup/
+backups/
+exports/
+private/
+
+# Source documents and office files (grid codes, company papers, spreadsheets, archives).
+# Fixtures for tests are generated in code, so no such file belongs in the repository.
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.zip
+*.7z
+*.rar
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
