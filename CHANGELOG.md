@@ -2,6 +2,14 @@
 
 All notable changes are listed here. Versions follow semantic versioning; dates are ISO (year-month-day).
 
+## [1.1.0] - 2026-11-13
+
+### Added
+- Find official documents: type a country or region and a year; the built-in source catalogue lists the documents published in or before that year with official reference, date, state at the cut-off and a link to the official publisher. The current year runs to today; a future year is treated as today.
+- Catalogue entries for Croatia, Australia, India, Germany, Spain, France, Italy, Poland, the Netherlands and the European Union; official operator list for the other ENTSO-E countries.
+- Add one or all found documents to the register with their metadata.
+- `scripts/check-sources.mjs` and the "Check official sources" workflow, which request every catalogue link from GitHub's servers.
+
 ## [1.0.0] - 2026-11-13
 
 First release.
@@ -25,4 +33,5 @@ First release.
 
 | Version | Date | Author | Summary |
 |---|---|---|---|
+| 1.1.0 | 2026-11-13 | Sathyanarayanan | Source catalogue with year cut-off |
 | 1.0.0 | 2026-11-13 | Sathyanarayanan | First release |

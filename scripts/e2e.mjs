@@ -740,6 +740,118 @@ console.log('\nGroup 4: folder sync between two simulated devices (folder picker
 }
 
 // =====================================================================================
+console.log('\nGroup 6: find official documents by country and year');
+{
+  const ctx = await browser.createBrowserContext();
+  const page = await newPage(ctx);
+  const h = helpers(page);
+  const outside = [];
+  page.on('request', (r) => { if (!r.url().startsWith(url) && !r.url().startsWith('data:') && !r.url().startsWith('blob:')) outside.push(r.url()); });
+  await page.goto(url, { waitUntil: 'load' }); await page.waitForSelector(D); await page.click(D + ' [data-close]'); await h.noDialog();
+  const ist = new Date(Date.now() + 330 * 60000);
+  const today = String(ist.getUTCDate()).padStart(2, '0') + '/' + String(ist.getUTCMonth() + 1).padStart(2, '0') + '/' + ist.getUTCFullYear();
+  const find = async (place, year) => { await h.set(D + ' input[name="place"]', place); await h.set(D + ' input[name="year"]', year); await h.submit(); };
+  const rows = () => page.$$eval(D + ' #src-results tbody tr', (els) => els.map((e) => e.children[1].textContent.trim()));
+
+  await t('function', 'unknown place and bad year are refused with a way forward', async () => {
+    await h.click('main [data-act="src-find"]');
+    eq(await page.$eval(D + ' input[name="year"]', (e) => [e.value, e.inputMode]), [String(ist.getUTCFullYear()), 'numeric'], 'year defaults to the current year, numeric keyboard');
+    await find('Atlantis', '2017');
+    ok((await h.txt(D + ' .form-error')).includes('"Atlantis" is not in the source catalogue yet') && (await h.txt(D + ' .form-error')).includes('What to collect'), 'unknown place');
+    eq(await page.evaluate(() => document.activeElement.name), 'place', 'focus on the field to fix');
+    await find('Croatia', '20x7');
+    ok((await h.txt(D + ' .form-error')).includes('is not a year'), 'bad year');
+    await find('', '2017');
+    ok((await h.txt(D + ' .form-error')).includes('Type a country or region'), 'empty place');
+  });
+
+  await t('function', 'year 2017 lists only documents in and before 2017', async () => {
+    await find('Croatia', '2017');
+    ok((await h.txt(D + ' #src-results h3')).includes('Croatia: documents published up to 31/12/2017'), 'cut-off shown');
+    eq(await rows(), ['NN 67/2017', 'OJ L 312, 28.11.2017', 'OJ L 220, 25.8.2017', 'OJ L 241, 8.9.2016', 'OJ L 223, 18.8.2016', 'OJ L 112, 27.4.2016'], 'six documents');
+    ok((await h.txt(D + ' #src-results')).includes('7 later documents are hidden by the cut-off'), 'later documents counted');
+    eq(await h.txt(D + ' .form-error'), '', 'earlier error cleared');
+  });
+
+  await t('function', 'current year runs to today; a future year is treated as today and says so', async () => {
+    await find('hrvatska', String(ist.getUTCFullYear()));
+    ok((await h.txt(D + ' #src-results h3')).includes('up to ' + today), 'current year: until today');
+    const now = await rows();
+    eq(now.length, 13, 'all thirteen entries');
+    eq(now.slice(0, 3), ['NN 10/2024', 'NN 128/2020', 'NN 67/2017'], 'newest transmission code first');
+    ok(!(await h.has(D + ' #src-results .note.warn')), 'no note for the current year');
+    await find('Croatia', '2031');
+    ok((await h.txt(D + ' #src-results .note.warn')).includes('2031 is in the future') && (await h.txt(D + ' #src-results h3')).includes('up to ' + today), 'future year note');
+    eq(await rows(), now, 'same list as today');
+    const states = await page.$$eval(D + ' #src-results tbody tr', (els) => els.slice(0, 3).map((e) => e.children[4].textContent.trim()));
+    eq(states, ['Current', 'Supersededby NN 10/2024', 'Supersededby NN 10/2024'], 'state at the cut-off');
+  });
+
+  await t('function', 'links go to official publishers in a new tab; the page itself contacts no other site', async () => {
+    const links = await page.$$eval(D + ' #src-results a[href]', (els) => els.map((e) => [new URL(e.href).protocol, new URL(e.href).hostname, e.target, e.rel]));
+    ok(links.length === 18 && links.every(([proto, , target, rel]) => proto === 'https:' && target === '_blank' && rel === 'noopener noreferrer'), 'link attributes: ' + JSON.stringify(links.slice(0, 2)));
+    eq([...new Set(links.map((l) => l[1]))].sort(), ['eur-lex.europa.eu', 'narodne-novine.nn.hr', 'www.entsoe.eu', 'www.hera.hr', 'www.hops.hr'], 'official hosts only');
+    eq(outside, [], 'requests to other sites made by the page');
+  });
+
+  await t('function', 'found documents are added to the register once, with metadata and cut-off note', async () => {
+    await h.click(D + ' [data-src-add="0"]');
+    let docs = live(await h.recs(), 'doc');
+    eq(docs.map((d) => [d.country, d.ref, d.published, d.status, d.kind, d.text]), [['Croatia', 'NN 10/2024', '2024-01-26', 'in_force', 'tso', '']], 'one entry');
+    ok(docs[0].url.startsWith('https://narodne-novine.nn.hr/') && docs[0].notes.includes('cut-off ' + today), 'link and note stored');
+    eq(await page.$eval(D + ' #src-results tbody tr', (e) => e.children[6].textContent.trim()), 'In the register', 'row marked');
+    await h.click(D + ' #src-add-all');
+    docs = live(await h.recs(), 'doc');
+    eq(docs.length, 13, 'the other twelve added, none twice');
+    eq(docs.filter((d) => d.status === 'superseded').map((d) => d.ref).sort(), ['NN 128/2020', 'NN 67/2017'], 'superseded entries marked');
+    eq(await page.$eval(D + ' #src-add-all', (e) => e.disabled), true, 'nothing left to add');
+    await page.click(D + ' [data-close]'); await h.noDialog();
+    await h.go('#docs');
+    eq(await h.count('main table.resp tbody tr'), 13, 'register lists them');
+    eq(await page.$eval('#country', (e) => e.value), 'Croatia', 'country filter set');
+  });
+
+  await t('function', 'a region and a country without own entries still give official sites', async () => {
+    await h.click('main [data-act="src-find"]');
+    await find('EU', '2016');
+    eq(await rows(), ['OJ L 241, 8.9.2016', 'OJ L 223, 18.8.2016', 'OJ L 112, 27.4.2016'], 'EU documents up to 2016');
+    await find('Austria', '');
+    ok((await h.txt(D + ' #src-results')).includes('No document entries for Austria yet'), 'explains the gap');
+    eq(await page.$$eval(D + ' #src-results .list li b', (els) => els.map((e) => e.textContent)), ['EUR-Lex.', 'ENTSO-E member companies.'], 'official sites offered');
+    eq((await rows()).length, 5, 'EU regulations apply');
+    await find('India', '2018');
+    eq(await rows(), ['IEGC 2010', 'Regulations 2013', 'Amendment 2013', 'Grid Standards 2010', 'No. 12/X/STD(CONN)/GM/CEA'], 'India up to 2018: grid code, distributed generation, then standards newest first; 2019 and later hidden');
+    await find('Croatia', '1999');
+    ok((await h.txt(D + ' #src-results .empty')).includes('No catalogued document for Croatia was published on or before 31/12/1999'), 'empty result explains itself');
+  });
+
+  await t('appearance', 'find dialog on a 320 px phone: fits, rows as cards, 44 px targets', async () => {
+    await page.setViewport({ width: 320, height: 720, deviceScaleFactor: 1, hasTouch: true, isMobile: true });
+    await sleep(200); // switching to phone emulation reloads the page, so the dialog is opened again
+    await page.evaluate(() => document.querySelectorAll('dialog[open]').forEach((d) => d.close()));
+    await h.go('#home'); await h.click('main [data-act="src-find"]');
+    await find('Croatia', '2020'); await sleep(80);
+    const m = await page.evaluate((d) => {
+      const dlg = document.querySelector(d), body = dlg.querySelector('.dlg-body'), r = dlg.getBoundingClientRect();
+      const small = [...dlg.querySelectorAll('button, a.btn, input')].filter((e) => e.getBoundingClientRect().height > 0).map((e) => [e.textContent.trim().slice(0, 18) || e.name, Math.round(e.getBoundingClientRect().height), Math.round(e.getBoundingClientRect().width)]).filter((x) => x[1] < 44 || x[2] < 44);
+      return { right: r.right, vw: innerWidth, overflow: body.scrollWidth - body.clientWidth, small, td: getComputedStyle(dlg.querySelector('table.resp td')).display };
+    }, D);
+    ok(m.right <= m.vw && m.overflow <= 0, 'dialog fits: ' + JSON.stringify(m));
+    eq(m.small, [], 'touch targets under 44 px');
+    eq(m.td, 'block', 'rows as cards');
+    if (shotsDir) await page.screenshot({ path: join(shotsDir, 'phone-320-find.png') });
+    await page.click(D + ' [data-close]'); await h.noDialog();
+    await page.setViewport({ width: 1280, height: 900 }); await sleep(200);
+    await page.evaluate(() => document.querySelectorAll('dialog[open]').forEach((d) => d.close())); await h.go('#docs'); await h.click('main [data-act="src-find"]'); await find('Croatia', '2020'); await sleep(80);
+    const desk = await page.evaluate((d) => { const dlg = document.querySelector(d), body = dlg.querySelector('.dlg-body'), p = dlg.querySelector('.dlg-body > p'); return { bodyOverflow: body.scrollWidth - body.clientWidth, pRight: p.getBoundingClientRect().right, bodyRight: body.getBoundingClientRect().right }; }, D);
+    ok(desk.bodyOverflow <= 0 && desk.pRight <= desk.bodyRight, 'desktop dialog: the text is not clipped and the body does not scroll sideways: ' + JSON.stringify(desk));
+    if (shotsDir) await page.screenshot({ path: join(shotsDir, 'desktop-find.png') });
+    await page.click(D + ' [data-close]'); await h.noDialog();
+  });
+  await ctx.close();
+}
+
+// =====================================================================================
 console.log('\nGroup 5: speed of the slowest actions');
 {
   const ctx = await browser.createBrowserContext();

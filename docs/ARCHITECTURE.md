@@ -22,8 +22,10 @@ src/
     transfer.js    CSV import plans, CSV export, JSON backup
     report.js      requirements document (data -> Markdown / HTML)
     stats.js       dashboard figures
+    sourcing.js    source catalogue rules: year cut-off, place matching, state at the cut-off
     docx.js        .docx reader (ZIP + XML)
     pdf.js         PDF text reader
+  sources/catalog.js  hand-researched catalogue of official documents and publishers
   app/             browser only: views, dialogs, IndexedDB, folder access, translation
   styles.css, index.template.html, sw.js, manifest.webmanifest, icons/
 scripts/           build, local server, browser tests, icon generator
@@ -81,8 +83,13 @@ n = records or text length, k = records of one type, c = checks of a requirement
 | .docx read | O(n) | O(n) | one pass over XML tokens |
 | PDF read | O(n + Σ m log m) | O(n) | chunks sorted per page |
 | Sync pull | O(f + n) | O(n) | f = files; unchanged files skipped by signature |
+| Find sources for a place and year | O(c log c) | O(c) | c = catalogue entries; series grouped in a map |
 
 Nothing is worse than O(n log n).
+
+## Source catalogue
+
+`src/sources/catalog.js` lists countries (with other spellings), regions and their members, official bodies and documents. A document belongs to a `series` and is a `base` version or an `amendment`. `findSources` keeps the entries published on or before the cut-off (31 December of a past year; today for the current year or any future year) and marks each as current (latest base version of its series at the cut-off), an amendment in force, or superseded. The page never contacts the publishers; `scripts/check-sources.mjs` does that from GitHub's servers monthly and on demand.
 
 ## Sync
 

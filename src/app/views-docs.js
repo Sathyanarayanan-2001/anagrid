@@ -24,6 +24,7 @@ export function viewDocs() {
   for (const r of d.reqs) perDoc.set(r.docId, (perDoc.get(r.docId) || 0) + 1);
   return h`<section class="view">
     <div class="head"><h1>Documents</h1>
+      <button type="button" class="btn" data-act="src-find">Find official documents</button>
       <button type="button" class="btn" data-act="checklist">What to collect</button>
       <button type="button" class="btn primary" data-act="doc-add">Add a document</button></div>
     ${!d.docs.length ? emptyStart('No documents yet') : !docs.length ? h`<div class="empty"><p>No documents for ${app.state.country}. Add one, or pick another country at the top.</p></div>` : h`

@@ -10,6 +10,7 @@ import { viewDocs, docDialog, checklistDialog, deleteDoc, extractDialog, transla
 import { viewReqs, reqListPart, reqDialog, reqAddDialog, viewCompliance, capDialog } from './views-reqs.js';
 import { viewReport, viewData, reportActions, dataActions, handleDataFile } from './views-data.js';
 import { applyBars } from './charts.js';
+import { sourceDialog } from './views-sources.js';
 import { SAMPLE_SIZE } from './sample.js';
 
 const VIEWS = { home: viewHome, dashboard: viewDashboard, docs: viewDocs, reqs: viewReqs, compliance: viewCompliance, report: viewReport, data: viewData, guide: viewGuide };
@@ -136,6 +137,7 @@ const actions = {
   'doc-page': (el) => { app.state.docFrom = Number(el.dataset.from); app.state.docLine = 0; render(); $('#doctext')?.scrollIntoView({ block: 'start' }); },
   'doc-orig': () => { app.state.docOrig = !app.state.docOrig; render(); },
   checklist: checklistDialog,
+  'src-find': sourceDialog,
   'req-open': (el) => reqDialog(el.dataset.id),
   'req-add': reqAddDialog,
   'req-more': () => { app.state.limit += 150; $('#req-list').innerHTML = reqListPart().s; },
