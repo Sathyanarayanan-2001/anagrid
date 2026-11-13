@@ -177,6 +177,12 @@ dl.meta dt { color: var(--text-2); font-size: var(--fs-13); }
 .cand .meta-line { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; font-size: var(--fs-12); color: var(--text-2); }
 .scroll { max-height: 55vh; overflow: auto; border: 1px solid var(--border-soft); border-radius: 10px; background: var(--surface); }
 .checks { display: grid; grid-template-columns: minmax(8rem, 2fr) 4.5rem minmax(4.5rem, 1fr) 5.5rem auto; gap: .4rem; align-items: center; }
+#src-results > * + * { margin-top: .75rem; }
+#src-results .list .chip { white-space: normal; }
+#src-results .list a { overflow-wrap: anywhere; }
+#src-results td:first-child { min-width: 12rem; }
+#src-results th:last-child, #src-results td:last-child { white-space: nowrap; }
+.btn.sm { white-space: nowrap; }
 .steps { counter-reset: s; list-style: none; padding: 0; display: grid; gap: .6rem; }
 .steps li { counter-increment: s; display: grid; grid-template-columns: 1.9rem minmax(0, 1fr); gap: .6rem; }
 .steps li::before { content: counter(s); width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent-soft-ink); display: grid; place-items: center; font-weight: 600; }
@@ -190,7 +196,8 @@ dialog::backdrop { background: rgba(15, 23, 42, .55); }
 dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 1.5rem); }
 .dlg-head { display: flex; align-items: center; gap: .5rem; padding: .75rem 1rem; border-bottom: 1px solid var(--border-soft); }
 .dlg-head h2 { margin-right: auto; }
-.dlg-body { padding: 1rem; overflow: auto; display: grid; gap: .8rem; }
+.dlg-body { padding: 1rem; overflow: auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: .8rem; }
+.dlg-body > * { min-width: 0; }
 .dlg-foot { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; padding: .75rem 1rem; border-top: 1px solid var(--border-soft); }
 .form-error { color: var(--danger); background: var(--danger-soft); border: 1px solid var(--danger); border-radius: 8px; padding: .5rem .75rem; }
 .form-error:empty { display: none; }
@@ -231,6 +238,7 @@ dialog form { display: flex; flex-direction: column; max-height: calc(100dvh - 1
   .tile { padding: .6rem .75rem; }
   .tile .v { font-size: var(--fs-20); }
   .tile.wide { grid-column: 1 / -1; }
+  #src-results td:first-child { min-width: 0; }
   .span2 { grid-column: auto; }
   h1 { font-size: var(--fs-20); }
   table.resp thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }

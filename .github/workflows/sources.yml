@@ -1,0 +1,26 @@
+name: Check official sources
+
+# Requests every link of the source catalogue. Runs monthly, on demand, and on pull requests that change it.
+on:
+  schedule:
+    - cron: '17 3 1 * *'
+  workflow_dispatch:
+  # A pull request that changes the catalogue or the checker gets its links checked before merging.
+  pull_request:
+    paths:
+      - 'src/sources/**'
+      - 'scripts/check-sources.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 22
+      - name: Request every catalogue link
+        run: node scripts/check-sources.mjs

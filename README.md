@@ -10,6 +10,7 @@ AnaGrid keeps the grid connection documents of each country you work in, reads t
 
 ## Features
 
+- **Find official documents.** Type a country or region and a year: a built-in catalogue (Croatia, Australia, India, Germany, Spain, France, Italy, Poland, the Netherlands and EU-level regulation) lists the official documents published on or before the end of that year, with their state at that date and a link to the publisher, and registers them with one press. The current year runs to today; a future year is treated as today. A monthly GitHub workflow requests every catalogue link and reports dead ones.
 - **Document register** per country: transmission and distribution codes, EU regulation, national parameter decisions, operator data lists, standards. A checklist shows which kinds are still missing for a country.
 - **Reads .docx, text-based .pdf and .txt on the device.** No upload, no library: the Word and PDF readers are part of the app.
 - **Translation to English inside the browser** (Chrome 138 or later on a desktop), line by line, so line numbers and citations stay valid for the original and the English text.
@@ -48,6 +49,7 @@ In the app: **Add a document**, choose **Extract requirements**, record **turbin
 - Extraction is rule based and deterministic. It does not interpret figures, formulas or scanned pages, and it reads English wording best.
 - PDF text is read by position; check tables against the source. Password-protected and scanned PDFs cannot be read.
 - Translation needs desktop Chrome; elsewhere, paste an English text.
+- The page cannot download documents from other sites; the source catalogue gives the official link and the text is imported from the saved file. Countries outside the catalogue get the official operator list and the document-type checklist.
 - The tool supports an engineering review and does not replace it.
 
 ## Documentation

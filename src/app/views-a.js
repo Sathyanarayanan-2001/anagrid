@@ -7,8 +7,8 @@ import { barChart, statusChart, pct } from './charts.js';
 import { SAMPLE_SIZE } from './sample.js';
 
 const emptyStart = (what) => h`<div class="empty"><h2>${what}</h2>
-  <p>Add a grid code document to begin, or load the worked example to see a finished requirement sheet.</p>
-  <div class="row" role="group"><button type="button" class="btn primary" data-act="doc-add">Add a document</button><button type="button" class="btn" data-act="sample-load">Load worked example</button></div></div>`;
+  <p>Add a grid code document to begin, find a country's official documents, or load the worked example to see a finished requirement sheet.</p>
+  <div class="row" role="group"><button type="button" class="btn primary" data-act="doc-add">Add a document</button><button type="button" class="btn" data-act="src-find">Find official documents</button><button type="button" class="btn" data-act="sample-load">Load worked example</button></div></div>`;
 export { emptyStart };
 
 export function viewHome() {
@@ -17,6 +17,7 @@ export function viewHome() {
     <div class="head"><h1>Grid code requirements for wind turbines</h1></div>
     <p class="lead">AnaGrid keeps the grid connection documents of each country you work in, reads them line by line, and turns them into one requirement sheet in which every requirement cites its document, article, paragraph and line. Record the turbine's proven capabilities and each requirement is judged as compliant, partially compliant, non-compliant or insufficient data.</p>
     <div class="row"><button type="button" class="btn primary" data-act="doc-add">Add a document</button>
+      <button type="button" class="btn" data-act="src-find">Find official documents</button>
       ${d.docs.length ? h`<a class="btn" href="#reqs">Open requirements</a>` : h`<button type="button" class="btn" data-act="sample-load">Load worked example</button>`}
       <button type="button" class="btn quiet" data-act="quickstart">Quick start</button></div>
     ${app.volatile ? h`<p class="note bad">This browser is not letting the app store data, so anything you add is lost when the page closes. Leave private browsing, or allow site data for this page, then reload.</p>` : ''}
@@ -53,7 +54,7 @@ export function viewGuide() {
     <div class="head"><h1>Guide</h1><button type="button" class="btn" data-act="quickstart">Open quick start</button></div>
     <div class="card"><h2>The workflow</h2>
       <ol class="steps">
-        <li><div><b>Collect.</b> On Documents choose a country and open <i>What to collect</i>: a checklist of document types (transmission code, distribution code, national parameter decisions, EU regulation, operator data lists, standards). The app has no network access, so you find the files at the operator, regulator and official gazette and add them here.</div></li>
+        <li><div><b>Collect.</b> Choose <i>Find official documents</i> (Home or Documents), type a country or region and a year. The built-in catalogue lists the documents published on or before the end of that year, each with its official reference, date, state at that date and a link to the official publisher. The current year runs to today; a future year is treated as today. Add entries to the register, open the link, save the file and attach it with Edit; the page cannot download from other sites itself. The catalogue covers Croatia, Australia, India, Germany, Spain, France, Italy, Poland, the Netherlands and EU-level regulation, and names the official operator list for the other ENTSO-E countries. <i>What to collect</i> gives the document types to look for elsewhere.</div></li>
         <li><div><b>Store.</b> Add each document with its official reference, date, language and status. Choose a .docx, .pdf or .txt file or paste the text. The text is kept on this device with line numbers; PDFs also keep page numbers.</div></li>
         <li><div><b>Translate.</b> If the text is not English, open the document and choose Translate. Translation runs inside the browser (Chrome 138 or later on a desktop). Lines keep their numbers, so citations hold for the original and the English text. In other browsers, paste an English version with Edit.</div></li>
         <li><div><b>Extract.</b> Choose Extract requirements. Every clause is split into paragraphs and table rows; obligations and numeric limits are recognised, classified into categories, and listed with article, paragraph, page and line. Review the list, untick what you do not need, and save. Nothing is saved before you press Save.</div></li>
@@ -83,6 +84,7 @@ export function viewGuide() {
     <div class="card"><h2>Version</h2>
       <p>AnaGrid ${VERSION}${BUILD_DATE ? h`, built ${BUILD_DATE}` : ''}.</p>
       <div class="table-wrap"><table class="resp"><thead><tr><th>Version</th><th>Date</th><th>Changes</th></tr></thead><tbody>
+        <tr><td data-l="Version">1.1.0</td><td data-l="Date">13/11/2026</td><td data-l="Changes">Find official documents: built-in source catalogue (Croatia, Australia, India, Germany, Spain, France, Italy, Poland, Netherlands, EU) filtered by country and year, state at the cut-off, one-press registration; monthly link check from GitHub.</td></tr>
         <tr><td data-l="Version">1.0.0</td><td data-l="Date">13/11/2026</td><td data-l="Changes">First release: document register, .docx and PDF reading, on-device translation, requirement extraction with citations, capability checks and determinations, dashboard, requirements document, CSV and JSON import and export, folder sync, offline use.</td></tr>
       </tbody></table></div></div>
   </section>`;

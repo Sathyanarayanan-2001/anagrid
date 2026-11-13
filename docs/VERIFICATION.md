@@ -1,4 +1,17 @@
-# Verification record, version 1.0.0 (13/11/2026)
+# Verification record
+
+## Version 1.1.0 (13/11/2026): source catalogue
+
+| Round | Unit tests | Browser: function | Browser: appearance | Review by eye | Outcome |
+|---|---|---|---|---|---|
+| 1 | 63 of 63 | 38 of 41 | 11 of 12 | dialog clipped on desktop, long role labels overflowing at 320 px | 4 defects fixed (cached register after add, dialog body width, chip wrapping, test expectations) |
+| 2, rerun | 63 of 63 | 41 of 41 | 12 of 12 | clean | pass |
+
+Added: 7 unit tests (year cut-off, dates, place names, state at cut-off, register entry, catalogue integrity, worked case) and 7 browser checks (unknown place and bad year, year 2017, current and future year, link attributes and no outside requests, add once, region and country without entries, 320 px dialog). The catalogue integrity test checks every entry for an https link on an official host, a valid date not after the review day, a known document type and a register entry that passes validation.
+
+Catalogue links were taken from the official pages found during research on 13/11/2026; this session cannot request them. The workflow "Check official sources" requests every link from GitHub's servers (monthly and on demand); its first run is reported in the pull request.
+
+# Version 1.0.0 (13/11/2026)
 
 Everything below was run during the build session on Node 22.23 and Chrome for Testing 153 (headless, Linux). What was **not** run is listed at the end; nothing in this file is reported from memory.
 

@@ -19,6 +19,8 @@ Scales 1 to 10. Severity: effect on a compliance decision. Occurrence: how often
 | 11 | Storage | Two devices edit the same record | One edit lost | Concurrent work | 4 | 3 | 2 | 24 | Per-record merge, newer wins, deterministic tie-break; tombstones | none |
 | 12 | Storage | Save file half-delivered by the sync app | Sync stops | Cloud latency | 5 | 4 | 1 | 20 | Unreadable files skipped and retried; state shows files still arriving | none |
 | 13 | Reporting | Spreadsheet alters clause numbers on CSV round trip | "5.10" becomes 5.1 | Spreadsheet type guessing | 6 | 3 | 1 | 18 | Reference-like text written as `="5.10"` and unwrapped on import | none |
+| 15 | Sourcing | Catalogue link dead or document moved by the publisher | User cannot reach the text | Publishers restructure sites | 4 | 4 | 2 | 32 | Monthly link check from GitHub with an error annotation; official site listed beside every document | Correct the entry in a pull request |
+| 16 | Sourcing | Catalogue misses a newer document | Study built on an outdated code | Catalogue reviewed by hand | 8 | 4 | 4 | 128 | Review date shown with every result; official sites listed for a check | Re-review the catalogue before each study and when the link check runs |
 | 14 | Import | Hostile content in a document or file name | Script execution | Untrusted files | 9 | 1 | 1 | 9 | Escape-by-default rendering; strict CSP; tested | none |
 
 ## DMAIC
