@@ -1,6 +1,6 @@
 {
   "name": "anagrid",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Grid code document register, requirement extractor and compliance sheet for wind turbine grid connection. Static, offline-first, single-file web app.",
   "private": true,
   "type": "module",

@@ -180,6 +180,7 @@ dl.meta dt { color: var(--text-2); font-size: var(--fs-13); }
 #src-results > * + * { margin-top: .75rem; }
 #src-results .list .chip { white-space: normal; }
 #src-results .list a { overflow-wrap: anywhere; }
+#src-results .list li, #src-results .list li > * { min-width: 0; }
 #src-results td:first-child { min-width: 12rem; }
 #src-results th:last-child, #src-results td:last-child { white-space: nowrap; }
 .btn.sm { white-space: nowrap; }
