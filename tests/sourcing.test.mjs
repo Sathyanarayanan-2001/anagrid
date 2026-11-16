@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { resolveYear, resolvePlace, findSources, onOrBefore, dateLabel, toRegisterInput, placeNames } from '../src/core/sourcing.js';
-import { CATALOG, DOCS, BODIES, COUNTRIES, REGIONS } from '../src/sources/catalog.js';
+import { CATALOG, CATALOG_REVIEWED, DOCS, BODIES, COUNTRIES, REGIONS } from '../src/sources/catalog.js';
 import { DOC_KIND_BY_ID } from '../src/core/catalog.js';
 import { makeDoc } from '../src/core/model.js';
 import { InputError } from '../src/core/util.js';
@@ -83,7 +83,9 @@ test('a found document becomes a valid register entry', () => {
 
 test('the shipped catalogue is well formed and points only at official publishers', () => {
   const OFFICIAL = new Set(['eur-lex.europa.eu', 'www.entsoe.eu', 'www.hops.hr', 'www.hera.hr', 'narodne-novine.nn.hr', 'cea.nic.in', 'www.cercind.gov.in', 'ctuil.in', 'egazette.gov.in',
-    'www.aemc.gov.au', 'aemo.com.au', 'www.vde.com', 'www.ree.es', 'api.esios.ree.es', 'www.boe.es', 'www.cre.fr', 'www.legifrance.gouv.fr', 'www.terna.it', 'www.arera.it', 'www.pse.pl', 'bip.ure.gov.pl', 'www.acm.nl', 'wetten.overheid.nl']);
+    'www.aemc.gov.au', 'aemo.com.au', 'www.vde.com', 'www.ree.es', 'api.esios.ree.es', 'www.boe.es', 'www.cre.fr', 'www.legifrance.gouv.fr', 'www.terna.it', 'www.arera.it', 'www.pse.pl', 'bip.ure.gov.pl', 'www.acm.nl', 'wetten.overheid.nl',
+    'www.svk.se', 'ei.se', 'www.fingrid.fi', 'energiavirasto.fi']);
+  const reviewed = { y: +CATALOG_REVIEWED.slice(0, 4), m: +CATALOG_REVIEWED.slice(5, 7), d: +CATALOG_REVIEWED.slice(8, 10) };
   const codes = new Set([...COUNTRIES.map((c) => c[0]), ...REGIONS.map((r) => r.code)]);
   assert.equal(new Set(COUNTRIES.map((c) => c[0])).size, COUNTRIES.length, 'country codes are unique');
   for (const r of REGIONS) for (const m of r.members) assert.ok(COUNTRIES.some((c) => c[0] === m), r.code + ' member ' + m + ' has a name');
@@ -94,7 +96,7 @@ test('the shipped catalogue is well formed and points only at official publisher
     assert.ok(codes.has(d.scope), d.ref + ' scope'); assert.ok(DOC_KIND_BY_ID.has(d.kind), d.ref + ' kind');
     assert.ok(['base', 'amendment'].includes(d.role) && d.series && d.title && d.issuer && d.ref && d.lang, d.ref + ' fields');
     assert.match(d.date, /^\d{4}(-\d{2}-\d{2})?$/, d.ref + ' date');
-    assert.ok(onOrBefore(d.date, { y: 2026, m: 11, d: 13 }), d.ref + ' is not dated after the review day');
+    assert.ok(onOrBefore(d.date, reviewed), d.ref + ' is not dated after the review day');
     const u = new URL(d.url);
     assert.equal(u.protocol, 'https:'); assert.ok(OFFICIAL.has(u.hostname), d.ref + ' host ' + u.hostname);
     assert.ok(!seen.has(d.scope + d.title), 'duplicate ' + d.title); seen.add(d.scope + d.title);
@@ -131,4 +133,22 @@ test('worked case from the request: Croatia in 2017, in 2020 and today', () => {
   // India: the 2010 grid code is superseded by 2023, which the 2024 amendment amends.
   assert.deepEqual(findSources(resolvePlace('India', CATALOG), TODAY, CATALOG).docs.filter((d) => d.series === 'in-iegc').map((d) => d.ref + ':' + d.state), ['First Amendment 2024:amends', 'No. L-1/265/2022/CERC:current', 'IEGC 2010:superseded']);
   assert.equal(resolvePlace('Brazil', CATALOG), null);
+});
+
+test('Sweden and Finland: versions, drafts and translations at different cut-offs', () => {
+  const own = (place, y, code) => findSources(resolvePlace(place, CATALOG), resolveYear(y, TODAY).cutoff, CATALOG).docs.filter((d) => d.scope === code).map((d) => d.ref + ':' + d.state);
+  // By hand. Sweden: SvKFS 2005:2 alone in 2017; EIFS 2018:2 and 2019:3 join in 2019.
+  assert.deepEqual(own('Sverige', '2017', 'SE'), ['SvKFS 2005:2:current']);
+  assert.deepEqual(own('Sweden', '2019', 'SE'), ['EIFS 2019:3:current', 'EIFS 2018:2:current', 'SvKFS 2005:2:current']);
+  // Today: EIFS 2025:2 replaces SvKFS 2005:2 and is amended by 2026:3; the 2026 draft is its own series, so EIFS 2018:2 stays current.
+  assert.deepEqual(own('Sweden', '', 'SE'), ['EIFS 2026 draft:current', 'EIFS 2026:3:amends', 'EIFS 2025:2:current', 'EIFS 2019:3:current', 'EIFS 2018:2:current', 'SvKFS 2005:2:superseded',
+    'Svk 2021/5426 guide:current', 'Svk 2021/5426 verification:current', 'Svk 2023/1566:current', 'Svk 2023/1513:current']);
+  // Sweden is an EU member, so the five EU codes come with it.
+  assert.equal(findSources(resolvePlace('Sweden', CATALOG), TODAY, CATALOG).docs.filter((d) => d.scope === 'EU').length, 5);
+  // Finland: a year-only date counts as 31 December, so YLE2017 sorts before VJV2013 in 2017.
+  assert.deepEqual(own('Suomi', '2017', 'FI'), ['YLE2017:current', 'VJV2013:current']);
+  assert.deepEqual(own('Finland', '2018', 'FI'), ['VJV2018:current', 'YLE2017:current', 'VJV2013:superseded', 'VJV2018 (EN):current']);
+  assert.deepEqual(own('Finland', '2040', 'FI'), ['VJV2024:current', 'YLE2021:current', 'VJV2018:superseded', 'YLE2017:superseded', 'VJV2013:superseded',
+    'SSR converter-dominated 2026:current', 'ESCR guidance 2025:current', 'Dnro 3102/040303/2024:current', 'VJV2024 (EN):current', 'SSR SSO 2022:current', 'VJV2018 (EN):superseded']);
+  assert.deepEqual(findSources(resolvePlace('Finland', CATALOG), TODAY, CATALOG).bodies.filter((b) => b.scope === 'FI').map((b) => b.name), ['Fingrid, grid code specifications', 'Energiavirasto (Energy Authority)']);
 });

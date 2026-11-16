@@ -2,6 +2,13 @@
 
 All notable changes are listed here. Versions follow semantic versioning; dates are ISO (year-month-day).
 
+## [1.2.0] - 2026-11-16
+
+### Added
+- Sweden in the source catalogue: EIFS 2018:2 (national RfG requirements), Ei's 2026 draft to replace it (marked as not in force), EIFS 2019:3 (HVDC and DC-connected parks), SvKFS 2005:2 and its successor EIFS 2025:2 with amendment EIFS 2026:3, and four Svenska kraftnät connection and verification guides.
+- Finland in the source catalogue: VJV2013, VJV2018 and VJV2024 (official Finnish text) with Fingrid's unofficial English translations of VJV2018 and VJV2024, the Energiavirasto decision confirming VJV2024, YLE2017 and YLE2021, and three Fingrid study-requirement and guidance documents.
+- Official bodies for both countries: Svenska kraftnät, Energimarknadsinspektionen, Fingrid and Energiavirasto.
+
 ## [1.1.0] - 2026-11-13
 
 ### Added
@@ -34,4 +41,5 @@ First release.
 | Version | Date | Author | Summary |
 |---|---|---|---|
 | 1.1.0 | 2026-11-13 | Sathyanarayanan | Source catalogue with year cut-off |
+| 1.2.0 | 2026-11-16 | Sathyanarayanan | Sweden and Finland in the source catalogue |
 | 1.0.0 | 2026-11-13 | Sathyanarayanan | First release |
