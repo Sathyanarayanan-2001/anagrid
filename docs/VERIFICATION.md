@@ -6,7 +6,7 @@
 |---|---|---|---|---|---|
 | 1 | 63 of 64 | 41 of 41 | 11 of 12 | not run yet | 2 defects: one language label longer than the register allows; the official-sites list pushed the find dialog 21 px sideways at 320 px (also true for Austria and other countries without own entries) |
 | 2 | 64 of 64 | 41 of 41 | 12 of 12 | 1 dead of 85: SvKFS 2005:2 (svk.se file withdrawn after its repeal on 01/01/2026) | entry now links to Ei's notice of the change, marked as a publisher page |
-| 3 | 64 of 64 | 41 of 41 | 12 of 12 | see the pull request | |
+| 3 | 64 of 64 | 41 of 41 | 12 of 12 | 0 dead of 85: 76 ok, 9 refused (energiavirasto.fi answers 403 to GitHub runners, like AEMO and Légifrance; the page is in search indexes) | pass |
 
 Two methods. A: the new unit test compares the Swedish and Finnish lists at several cut-offs with lists worked out by hand from the dates; the browser test drives the same searches in the built page and checks hosts and the 320 px layout. B: every new date was read from the document itself or from the publisher's page that lists it (Ei's list of regulations and news, Svenska kraftnät document headers, Fingrid's specification, archive and news pages), and every link is requested from GitHub's servers by "Check official sources".
 
